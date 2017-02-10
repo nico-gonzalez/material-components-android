@@ -161,7 +161,6 @@ public class BottomNavigationView extends FrameLayout {
 
     if (a.hasValue(R.styleable.BottomNavigationView_tabletMode)) {
       mTabletMode = a.getBoolean(R.styleable.BottomNavigationView_tabletMode, false);
-      params.gravity = Gravity.TOP;
       mMenuView.setTabletMode(mTabletMode);
     }
 

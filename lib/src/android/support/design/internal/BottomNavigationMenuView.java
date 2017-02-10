@@ -31,14 +31,18 @@ import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.view.menu.MenuView;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 /** @hide For internal use only. */
 @RestrictTo(LIBRARY_GROUP)
 public class BottomNavigationMenuView extends ViewGroup implements MenuView {
   private final int mInactiveItemMaxWidth;
   private final int mInactiveItemMinWidth;
+  private final int mInactiveItemMaxHeight;
+  private final int mInactiveItemMinHeight;
   private final int mActiveItemMaxWidth;
   private final int mActiveItemMaxHeight;
   private final int mItemWidth;
@@ -72,6 +76,10 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
         res.getDimensionPixelSize(R.dimen.design_bottom_navigation_item_max_width);
     mInactiveItemMinWidth =
         res.getDimensionPixelSize(R.dimen.design_bottom_navigation_item_min_width);
+    mInactiveItemMaxHeight =
+            res.getDimensionPixelSize(R.dimen.design_bottom_navigation_item_max_height);
+    mInactiveItemMinHeight =
+            res.getDimensionPixelSize(R.dimen.design_bottom_navigation_item_min_height);
     mActiveItemMaxWidth =
         res.getDimensionPixelSize(R.dimen.design_bottom_navigation_active_item_max_width);
     mActiveItemMaxHeight =
@@ -112,7 +120,10 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
 
     final int heightSpec = MeasureSpec.makeMeasureSpec(mItemHeight, MeasureSpec.EXACTLY);
 
-    if (mShiftingMode) {
+    if (mTabletMode) {
+      measureTabletMode(heightMeasureSpec);
+      return;
+    } else if (mShiftingMode) {
       final int inactiveCount = count - 1;
       final int activeMaxAvailable = width - inactiveCount * mInactiveItemMinWidth;
       final int activeWidth = Math.min(activeMaxAvailable, mActiveItemMaxWidth);
@@ -126,9 +137,6 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
           extra--;
         }
       }
-    } else if (mTabletMode) {
-      measureTabletMode(heightMeasureSpec);
-      return;
     } else {
       final int maxAvailable = width / (count == 0 ? 1 : count);
       final int childWidth = Math.min(maxAvailable, mActiveItemMaxWidth);
@@ -166,14 +174,30 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
 
     final int widthSpec = MeasureSpec.makeMeasureSpec(mItemWidth, MeasureSpec.EXACTLY);
 
-    final int maxAvailable = height / (count == 0 ? 1 : count);
-    final int childHeight = Math.min(maxAvailable, mActiveItemMaxHeight);
-    int extra = height - childHeight * count;
-    for (int i = 0; i < count; i++) {
-      mTempChildSizes[i] = childHeight;
-      if (extra > 0) {
-        mTempChildSizes[i]++;
-        extra--;
+    if (mShiftingMode) {
+      final int inactiveCount = count - 1;
+      final int activeMaxAvailable = height - inactiveCount * mInactiveItemMinHeight;
+      final int activeHeight = Math.min(activeMaxAvailable, mActiveItemMaxHeight);
+      final int inactiveMaxAvailable = (height - activeHeight) / inactiveCount;
+      final int inactiveHeight = Math.min(inactiveMaxAvailable, mInactiveItemMaxHeight);
+      int extra = height - activeHeight - inactiveHeight * inactiveCount;
+      for (int i = 0; i < count; i++) {
+        mTempChildSizes[i] = (i == mActiveButton) ? activeHeight : inactiveHeight;
+        if (extra > 0) {
+          mTempChildSizes[i]++;
+          extra--;
+        }
+      }
+    } else {
+      final int maxAvailable = height / (count == 0 ? 1 : count);
+      final int childHeight = Math.min(maxAvailable, mActiveItemMaxHeight);
+      int extra = height - childHeight * count;
+      for (int i = 0; i < count; i++) {
+        mTempChildSizes[i] = childHeight;
+        if (extra > 0) {
+          mTempChildSizes[i]++;
+          extra--;
+        }
       }
     }
 
@@ -334,6 +358,11 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
     }
     mButtons = new BottomNavigationItemView[mMenu.size()];
     mShiftingMode = mMenu.size() > 3;
+    if (mTabletMode) {
+      FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
+      params.gravity = mShiftingMode ? Gravity.CENTER : Gravity.TOP;
+      setLayoutParams(params);
+    }
     for (int i = 0; i < mMenu.size(); i++) {
       mPresenter.setUpdateSuspended(true);
       mMenu.getItem(i).setCheckable(true);
