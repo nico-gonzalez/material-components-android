@@ -54,6 +54,7 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
 
   private boolean mShiftingMode = true;
   private boolean mTabletMode = false;
+  private boolean mKeepLabels = false;
 
   private BottomNavigationItemView[] mButtons;
   private int mActiveButton = 0;
@@ -345,6 +346,10 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
     this.mTabletMode = enabled;
   }
 
+  public void setKeepLabels(boolean keepLabels) {
+    this.mKeepLabels = keepLabels;
+  }
+
   public void buildMenuView() {
     if (mButtons != null) {
       for (BottomNavigationItemView item : mButtons) {
@@ -373,6 +378,7 @@ public class BottomNavigationMenuView extends ViewGroup implements MenuView {
       child.setTextColor(mItemTextColor);
       child.setItemBackground(mItemBackgroundRes);
       child.setShiftingMode(mShiftingMode);
+      child.setKeepLabels(mKeepLabels);
       child.setTabletMode(mTabletMode);
       child.initialize((MenuItemImpl) mMenu.getItem(i), 0);
       child.setItemPosition(i);

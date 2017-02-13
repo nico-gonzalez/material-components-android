@@ -34,7 +34,6 @@ import android.support.v7.view.menu.MenuView;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -62,6 +61,7 @@ public class BottomNavigationItemView extends FrameLayout implements MenuView.It
   private MenuItemImpl mItemData;
 
   private ColorStateList mIconTint;
+  private boolean mKeepLabels;
 
   public BottomNavigationItemView(@NonNull Context context) {
     this(context, null);
@@ -150,6 +150,7 @@ public class BottomNavigationItemView extends FrameLayout implements MenuView.It
         iconParams.topMargin = mDefaultMargin;
         mIcon.setLayoutParams(iconParams);
         mLargeLabel.setVisibility(VISIBLE);
+        mSmallLabel.setVisibility(INVISIBLE);
         ViewCompat.setScaleX(mLargeLabel, 1f);
         ViewCompat.setScaleY(mLargeLabel, 1f);
       } else {
@@ -160,8 +161,15 @@ public class BottomNavigationItemView extends FrameLayout implements MenuView.It
         mLargeLabel.setVisibility(INVISIBLE);
         ViewCompat.setScaleX(mLargeLabel, 0.5f);
         ViewCompat.setScaleY(mLargeLabel, 0.5f);
+        if (mKeepLabels) {
+          LayoutParams params = (LayoutParams) mSmallLabel.getLayoutParams();
+          params.topMargin = mDefaultMargin;
+          mSmallLabel.setLayoutParams(params);
+          mSmallLabel.setVisibility(VISIBLE);
+        } else {
+          mSmallLabel.setVisibility(INVISIBLE);
+        }
       }
-      mSmallLabel.setVisibility(INVISIBLE);
     } else {
       if (checked) {
         LayoutParams iconParams = (LayoutParams) mIcon.getLayoutParams();
@@ -257,5 +265,9 @@ public class BottomNavigationItemView extends FrameLayout implements MenuView.It
     Drawable backgroundDrawable =
         background == 0 ? null : ContextCompat.getDrawable(getContext(), background);
     ViewCompat.setBackground(this, backgroundDrawable);
+  }
+
+  public void setKeepLabels(boolean keepLabels) {
+    this.mKeepLabels = keepLabels;
   }
 }
