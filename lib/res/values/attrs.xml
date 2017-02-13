@@ -472,6 +472,9 @@
         <attr name="elevation"/>
         <!-- Flag that indicates if the BottomNavigationView should use tablet mode -->
         <attr name="tabletMode" format="boolean"/>
+        <!-- Flag that indicates if the BottomNavigationView should use keep unselected item
+        labels when in shifting mode mode -->
+        <attr name="keepLabels" format="boolean"/>
     </declare-styleable>
 
 </resources>

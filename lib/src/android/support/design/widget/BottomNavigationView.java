@@ -101,6 +101,7 @@ public class BottomNavigationView extends FrameLayout {
 
   private OnNavigationItemSelectedListener mListener;
   private boolean mTabletMode;
+  private boolean mKeepLabels;
 
   public BottomNavigationView(Context context) {
     this(context, null);
@@ -162,6 +163,12 @@ public class BottomNavigationView extends FrameLayout {
     if (a.hasValue(R.styleable.BottomNavigationView_tabletMode)) {
       mTabletMode = a.getBoolean(R.styleable.BottomNavigationView_tabletMode, false);
       mMenuView.setTabletMode(mTabletMode);
+    }
+
+    if (a.hasValue(R.styleable.BottomNavigationView_keepLabels)) {
+      mKeepLabels = a
+              .getBoolean(R.styleable.BottomNavigationView_keepLabels, false);
+      mMenuView.setKeepLabels(mKeepLabels);
     }
 
     if (a.hasValue(R.styleable.BottomNavigationView_menu)) {
